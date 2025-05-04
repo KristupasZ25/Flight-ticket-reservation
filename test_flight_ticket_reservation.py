@@ -49,6 +49,5 @@ class TestGenerateTicketPrice(unittest.TestCase):
         self.assertEqual(generate_ticket_price("Kaunas", "London"), 100)
         self.assertEqual(generate_ticket_price("Kaunas", "Paris"), 100)
 
-# Jei failas paleidžiamas kaip pagrindinis, vykdome testus.
 if __name__ == "__main__":
     unittest.main()
