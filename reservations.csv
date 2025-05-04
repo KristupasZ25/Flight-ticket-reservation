@@ -44,3 +44,11 @@ KristupasZ,Flight123,Kaunas,Athens - €100,2025-05-06,first,first
 KristupasZ,Flight123,Kaunas,Rome - €100,2025-05-05,first,first
 KristupasZ,Flight123,Kaunas,Rome - €100,2025-05-04,first,first
 KristupasZ,Flight123,Kaunas,Rome - €100,2025-05-05,business,business
+KristupasZ,Flight123,Vilnius,Madrid - €100,2025-05-05,economy,economy
+KristupasZ,Flight123,Kaunas,Madrid - €100,100,2025-05-05,N/A,first,2,400
+KristupasZ,Flight123,Kaunas,Madrid - €100,100,2025-05-05,N/A,first,2,400
+KristupasZ,Flight123,Kaunas,Madrid - €100,100,2025-05-04,2025-06-10,business,2,300
+KristupasZ,Flight123,Kaunas,Berlin - €100,100,2025-05-06,2025-06-10,first,2,400
+KristupasZ,Flight123,Vilnius,Rome - €100,100,2025-05-04,N/A,first,1,200
+ChrisZ,Flight123,Vilnius,Athens - €100,100,2025-05-05,2025-06-10,economy,2,200
+ChrisZ,Flight123,Kaunas,Madrid - €100,100,2025-05-04,N/A,first,1,200
