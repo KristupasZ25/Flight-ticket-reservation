@@ -15,7 +15,7 @@ TICKET_CLASSES = {
 }
 
 def generate_ticket_price(departure_city, destination_city):
-    base_price = 100
+    base_price = 100 
     return base_price
 
 class User:
@@ -41,9 +41,28 @@ class Flight:
     def get_ticket_price(self):
         return generate_ticket_price(self.departure_city, self.destination_city)
 
+class EconomyFlight(Flight):
+    def get_ticket_price(self):
+        return generate_ticket_price(self.departure_city, self.destination_city)
+
+class BusinessFlight(Flight):
+    def get_ticket_price(self):
+        return generate_ticket_price(self.departure_city, self.destination_city) + 50
+
+class FirstClassFlight(Flight):
+    def get_ticket_price(self):
+        return generate_ticket_price(self.departure_city, self.destination_city) + 100
+
 class FlightFactory:
-    def create_flight(self, departure_city, destination_city):
-        return Flight(departure_city, destination_city)
+    def create_flight(self, departure_city, destination_city, ticket_type):
+        if ticket_type == "economy":
+            return EconomyFlight(departure_city, destination_city)
+        elif ticket_type == "business":
+            return BusinessFlight(departure_city, destination_city)
+        elif ticket_type == "first":
+            return FirstClassFlight(departure_city, destination_city)
+        else:
+            return Flight(departure_city, destination_city)
 
 class Ticket:
     def __init__(self, flight, passenger, ticket_type, quantity):
@@ -201,11 +220,11 @@ class FlightBookingApp:
             messagebox.showerror("Input Error", "Please select all fields.")
             return
 
-        base_price = generate_ticket_price(departure_city, destination_city)
+        factory = FlightFactory()
+        flight = factory.create_flight(departure_city, destination_city, ticket_type)
 
         ticket_info = TICKET_CLASSES.get(ticket_type, {"price_addition": 0, "label": "Unknown Class"})
-        final_price = base_price + ticket_info["price_addition"]
-        final_price *= int(quantity)
+        final_price = flight.get_ticket_price() * int(quantity)
 
         ticket_type_label = ticket_info["label"]
 
