@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import ttk
 import csv
 
+# Paprasti duomenys, saugomi atmintyje
 users_db = [
     {"username": "KristupasZ", "password": "kursinis", "email": "kristupaszazeckis@gmail.com"},
     {"username": "ChrisZ", "password": "work", "email": "chriz@gmail.com"}
@@ -27,8 +28,8 @@ class User:
     def login(self, entered_username, entered_password):
         for user in users_db:
             if user['username'] == entered_username and user['password'] == entered_password:
-                return True
-        return False
+                return user  # Return the user object
+        return None  # Return None if login fails
 
 class Flight:
     def __init__(self, departure_city, destination_city):
@@ -63,7 +64,7 @@ class Ticket:
 
     def get_ticket_info(self):
         ticket_info = TICKET_CLASSES.get(self.ticket_type, {"label": "Unknown Class"})
-        return f"Ticket for {self.passenger.username} on flight: {self.flight.get_flight_info()} ({ticket_info['label']})\n" \
+        return f"Ticket for {self.passenger['username']} on flight: {self.flight.get_flight_info()} ({ticket_info['label']})\n" \
                f"Quantity: {self.quantity}\nTotal Price: €{self.ticket_price}"
 
     def get_ticket_price(self):
@@ -76,7 +77,7 @@ class FlightBookingApp:
         self.root.geometry("500x350")
         self.center_window(root, 500, 350)
 
-        self.users = users_db
+        self.current_user = None  # Current logged in user
         self.create_login_screen()
         self.is_booking_completed = False
 
@@ -111,8 +112,10 @@ class FlightBookingApp:
         entered_password = self.password_entry.get()
 
         user = User(entered_username, entered_password, "")
-        if user.login(entered_username, entered_password):
-            messagebox.showinfo("Login Successful", "Welcome back!")
+        logged_in_user = user.login(entered_username, entered_password)
+        if logged_in_user:
+            self.current_user = logged_in_user  # Store the current logged-in user
+            messagebox.showinfo("Login Successful", f"Welcome back, {self.current_user['username']}!")
             self.show_flight_search_screen()
         else:
             messagebox.showerror("Login Failed", "Incorrect username or password!")
@@ -177,7 +180,6 @@ class FlightBookingApp:
         self.search_button.grid(row=7, columnspan=2, pady=10)
 
     def toggle_return_date(self):
-        """Užrakina arba atrakina grįžimo datų laukelį, priklausomai nuo 'One-Way' pasirinkimo."""
         if self.one_way_var.get():
             self.return_date_combobox.config(state="disabled")
             self.return_date_combobox.set("N/A")
@@ -234,18 +236,29 @@ class FlightBookingApp:
         destination_city = self.destination_combobox.get()
         departure_date = self.departure_date_combobox.get()
         ticket_type = self.ticket_type_combobox.get()
+        return_date = self.return_date_combobox.get() if not self.one_way_var.get() else "N/A"
+        quantity = self.quantity_entry.get()
 
+        # Sukuriame Ticket objektą, kad apskaičiuotume bilieto kainą
+        flight = Flight(departure_city, destination_city)
+        ticket = Ticket(flight, self.current_user, ticket_type, quantity)  # Ticket objekto sukūrimas
+        total_price = ticket.get_ticket_price()  # Gaukite bendrą kainą iš Ticket objekto
+
+        # Įrašyti visą rezervacijos informaciją į CSV failą
         with open("reservations.csv", mode="a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow([self.users[0]['username'], 
-                             "Flight123",  
+            writer.writerow([self.current_user['username'], 
+                             "Flight123",  # Skrydžio numeris
                              departure_city, 
                              destination_city, 
+                             generate_ticket_price(departure_city, destination_city),  # Kaina
                              departure_date, 
+                             return_date,  # Grįžimo data
                              ticket_type, 
-                             ticket_type])
+                             quantity,  # Bilietų kiekis
+                             total_price])  # Bendra kaina
 
-        messagebox.showinfo("Successfully Booked", f"Your flight has been successfully booked!\nReservation receipt has been sent to {self.users[0]['email']}.")
+        messagebox.showinfo("Successfully Booked", f"Your flight has been successfully booked!\nReservation receipt has been sent to {self.current_user['email']}.")
         self.is_booking_completed = True
         self.show_logout_button()
 
